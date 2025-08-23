@@ -319,6 +319,29 @@ spec:
         period: 10s
         hosts: ["local-kube-state-metrics.base-prometheus:8080"]
         ssl.verification_mode: none
+      - id: kubernetes/metrics-kubernetes.state_persistentvolume
+        data_stream:
+          dataset: kubernetes.state_persistentvolume
+          type: metrics
+        metricsets:
+        - state_persistentvolume
+        add_metadata: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        period: 10s
+        hosts: ["local-kube-state-metrics.base-prometheus:8080"]
+        ssl.verification_mode: none
+      - id: kubernetes/metrics-kubernetes.state_persistentvolumeclaim
+        data_stream:
+          dataset: kubernetes.state_persistentvolumeclaim
+          type: metrics
+        metricsets:
+        - state_persistentvolumeclaim
+        add_metadata: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        period: 10s
+        hosts: ["local-kube-state-metrics.base-prometheus:8080"]
+        ssl.verification_mode: none
+
       - id: kubernetes/metrics-kubernetes.apiserver
         data_stream:
           dataset: kubernetes.apiserver
