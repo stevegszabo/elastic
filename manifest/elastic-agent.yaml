@@ -107,6 +107,7 @@ spec:
       spec:
         automountServiceAccountToken: true
         serviceAccountName: elastic-agent
+        hostPID: false
         volumes:
         - name: varlogcontainers
           hostPath:
@@ -140,13 +141,14 @@ spec:
       monitoring:
         enabled: true
         use_output: default
-        logs: false
-        metrics: false
+        logs: true
+        metrics: true
     providers:
       kubernetes:
         node: ${NODE_NAME}
         scope: node
     inputs:
+
     - id: container-log-${kubernetes.pod.name}-${kubernetes.container.id}
       type: filestream
       use_output: default
@@ -163,6 +165,7 @@ spec:
           type: logs
         prospector.scanner.symlinks: true
         paths: ["/var/log/containers/*${kubernetes.container.id}.log"]
+
     - id: kubernetes/metrics
       type: kubernetes/metrics
       use_output: default
@@ -173,6 +176,61 @@ spec:
       data_stream:
         namespace: default
       streams:
+      - id: kubernetes/metrics-kubernetes.apiserver
+        data_stream:
+          dataset: kubernetes.apiserver
+          type: metrics
+        metricsets:
+        - apiserver
+        add_metadata: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        period: 30s
+        hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+        ssl.certificate_authorities: ["/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"]
+      - id: kubernetes/metrics-kubernetes.system
+        data_stream:
+          dataset: kubernetes.system
+          type: metrics
+        metricsets:
+        - system
+        add_metadata: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        period: 10s
+        hosts: ["https://192.168.2.14:10250"]
+        ssl.verification_mode: none
+      - id: kubernetes/metrics-kubernetes.event
+        data_stream:
+          dataset: kubernetes.event
+          type: metrics
+        metricsets:
+        - event
+        add_metadata: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        period: 10s
+        hosts: ["https://192.168.2.14:10250"]
+        ssl.verification_mode: none
+      - id: kubernetes/metrics-kubernetes.node
+        data_stream:
+          dataset: kubernetes.node
+          type: metrics
+        metricsets:
+        - node
+        add_metadata: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        period: 10s
+        hosts: ["https://192.168.2.14:10250"]
+        ssl.verification_mode: none
+      - id: kubernetes/metrics-kubernetes.pod
+        data_stream:
+          dataset: kubernetes.pod
+          type: metrics
+        metricsets:
+        - pod
+        add_metadata: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        period: 10s
+        hosts: ["https://192.168.2.14:10250"]
+        ssl.verification_mode: none
       - id: kubernetes/metrics-kubernetes.container
         data_stream:
           dataset: kubernetes.container
@@ -184,3 +242,119 @@ spec:
         period: 10s
         hosts: ["https://192.168.2.14:10250"]
         ssl.verification_mode: none
+      - id: kubernetes/metrics-kubernetes.volume
+        data_stream:
+          dataset: kubernetes.volume
+          type: metrics
+        metricsets:
+        - volume
+        add_metadata: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        period: 10s
+        hosts: ["https://192.168.2.14:10250"]
+        ssl.verification_mode: none
+
+    - id: system/metrics
+      type: system/metrics
+      use_output: default
+      meta:
+        package:
+          name: system
+          version: 2.5.3
+      data_stream:
+        namespace: default
+      streams:
+      - id: system/metrics-system.cpu
+        data_stream:
+          dataset: system.cpu
+          type: metrics
+        metricsets:
+        - cpu
+        cpu.metrics:
+        - percentages
+        - normalized_percentages
+        period: 10s
+      - id: system/metrics-system.diskio
+        data_stream:
+          dataset: system.diskio
+          type: metrics
+        metricsets:
+        - diskio
+        diskio.include_devices: null
+        period: 10s
+      - id: system/metrics-system.filesystem
+        data_stream:
+          dataset: system.filesystem
+          type: metrics
+        metricsets:
+        - filesystem
+        period: 1m
+#        processors:
+#        - drop_event.when.regexp:
+#            system.filesystem.mount_point: ^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)
+      - id: system/metrics-system.fsstat
+        data_stream:
+          dataset: system.fsstat
+          type: metrics
+        metricsets:
+        - fsstat
+        period: 1m
+#        processors:
+#        - drop_event.when.regexp:
+#            system.fsstat.mount_point: ^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)
+      - id: system/metrics-system.load
+        data_stream:
+          dataset: system.load
+          type: metrics
+        metricsets:
+        - load
+        period: 10s
+      - id: system/metrics-system.memory
+        data_stream:
+          dataset: system.memory
+          type: metrics
+        metricsets:
+        - memory
+        period: 10s
+      - id: system/metrics-system.network
+        data_stream:
+          dataset: system.network
+          type: metrics
+        metricsets:
+        - network
+        period: 10s
+        network.interfaces: null
+      - id: system/metrics-system.process
+        data_stream:
+          dataset: system.process
+          type: metrics
+        metricsets:
+        - process
+        period: 10s
+        process.include_top_n.by_cpu: 5
+        process.include_top_n.by_memory: 5
+        process.cmdline.cache.enabled: true
+        process.cgroups.enabled: false
+        process.include_cpu_ticks: false
+        processes: [".*"]
+      - id: system/metrics-system.process_summary
+        data_stream:
+          dataset: system.process_summary
+          type: metrics
+        metricsets:
+        - process_summary
+        period: 10s
+      - id: system/metrics-system.socket_summary
+        data_stream:
+          dataset: system.socket_summary
+          type: metrics
+        metricsets:
+        - socket_summary
+        period: 10s
+      - id: system/metrics-system.uptime
+        data_stream:
+          dataset: system.uptime
+          type: metrics
+        metricsets:
+        - uptime
+        period: 10s
