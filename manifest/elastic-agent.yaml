@@ -353,12 +353,46 @@ spec:
         period: 30s
         hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
         ssl.certificate_authorities: ["/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"]
-      - id: kubernetes/metrics-kubernetes.system
+
+#      - id: kubernetes/metrics-kubernetes.proxy
+#        data_stream:
+#          dataset: kubernetes.proxy
+#          type: metrics
+#        metricsets:
+#        - proxy
+#        add_metadata: true
+#        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+#        period: 10s
+#        hosts: ["http://localhost:10249"]
+
+#      - id: kubernetes/metrics-kubernetes.scheduler
+#        data_stream:
+#          dataset: kubernetes.scheduler
+#          type: metrics
+#        metricsets:
+#        - scheduler
+#        add_metadata: true
+#        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+#        period: 10s
+#        hosts: ["http://localhost:10259"]
+
+#      - id: kubernetes/metrics-kubernetes.controllermanager
+#        data_stream:
+#          dataset: kubernetes.controllermanager
+#          type: metrics
+#        metricsets:
+#        - controllermanager
+#        add_metadata: true
+#        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+#        period: 10s
+#        hosts: ["http://localhost:10257"]
+
+      - id: kubernetes/metrics-kubernetes.container
         data_stream:
-          dataset: kubernetes.system
+          dataset: kubernetes.container
           type: metrics
         metricsets:
-        - system
+        - container
         add_metadata: true
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         period: 10s
@@ -397,12 +431,12 @@ spec:
         period: 10s
         hosts: ["https://192.168.2.14:10250"]
         ssl.verification_mode: none
-      - id: kubernetes/metrics-kubernetes.container
+      - id: kubernetes/metrics-kubernetes.system
         data_stream:
-          dataset: kubernetes.container
+          dataset: kubernetes.system
           type: metrics
         metricsets:
-        - container
+        - system
         add_metadata: true
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         period: 10s
