@@ -1,5 +1,11 @@
 # elastic
 
+![screenshot](images/elastic-01.png)
+![screenshot](images/elastic-02.png)
+![screenshot](images/elastic-03.png)
+![screenshot](images/elastic-04.png)
+![screenshot](images/elastic-05.png)
+
 ```
 ELASTIC_PASSWORD=$(kc -n elastic-01 get secret elastic-01-es-elastic-user -o json | jq -r .data.elastic | base64 -d)
 
