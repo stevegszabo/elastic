@@ -47,3 +47,10 @@ curl -v -k -u "elastic:$ELASTIC_PASSWORD" https://localhost:9200/logs-kubernetes
 curl -v -k -u "elastic:$ELASTIC_PASSWORD" https://localhost:9200/logs-kubernetes.container-default/_search?q=argo | jq -r .
 curl -v -k -u "elastic:$ELASTIC_PASSWORD" https://localhost:9200/logs-kubernetes.container-default/_search?q=argo | jq -r .hits.hits[0]
 ```
+
+![screenshot](images/elastic-01.png)
+![screenshot](images/elastic-02.png)
+![screenshot](images/elastic-03.png)
+![screenshot](images/elastic-04.png)
+![screenshot](images/elastic-05.png)
+![screenshot](images/elastic-06.png)
