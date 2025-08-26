@@ -4,6 +4,9 @@
 helm repo add elastic https://helm.elastic.co
 helm repo update
 
+helm pull elastic/eck-operator-crds --untar
+helm pull elastic/eck-operator --untar
+
 helm -n default install eck-crds eck-operator-crds/ 
 helm -n base-eck install eck eck-operator/ \
 --set=installCRDs=false \
@@ -39,14 +42,8 @@ curl -v -k -u "elastic:$ELASTIC_PASSWORD" https://localhost:9200/_nodes/elastic-
 
 curl -v -k -u "elastic:$ELASTIC_PASSWORD" https://localhost:9200/_data_stream | jq -r .data_streams[].name
 
-curl -v -k -u "elastic:$ELASTIC_PASSWORD" https://localhost:9200/.ds-logs-kubernetes.container-default-2025.08.24-000016/ | jq -r .
-curl -v -k -u "elastic:$ELASTIC_PASSWORD" https://localhost:9200/.ds-logs-kubernetes.container-default-2025.08.24-000016/_search?q=argo | jq -r .
-curl -v -k -u "elastic:$ELASTIC_PASSWORD" https://localhost:9200/.ds-logs-kubernetes.container-default-2025.08.24-000016/_search?q=argo | jq -r .hits.hits[0]
+curl -v -k -u "elastic:$ELASTIC_PASSWORD" https://localhost:9200/logs-kubernetes.container-default/ | jq -r .
+curl -v -k -u "elastic:$ELASTIC_PASSWORD" https://localhost:9200/logs-kubernetes.container-default/ | jq -r keys
+curl -v -k -u "elastic:$ELASTIC_PASSWORD" https://localhost:9200/logs-kubernetes.container-default/_search?q=argo | jq -r .
+curl -v -k -u "elastic:$ELASTIC_PASSWORD" https://localhost:9200/logs-kubernetes.container-default/_search?q=argo | jq -r .hits.hits[0]
 ```
-
-![screenshot](images/elastic-01.png)
-![screenshot](images/elastic-02.png)
-![screenshot](images/elastic-03.png)
-![screenshot](images/elastic-04.png)
-![screenshot](images/elastic-05.png)
-![screenshot](images/elastic-06.png)
