@@ -107,7 +107,6 @@ spec:
       spec:
         automountServiceAccountToken: true
         serviceAccountName: elastic-agent
-        hostPID: false
         volumes:
         - name: varlogcontainers
           hostPath:
@@ -117,15 +116,13 @@ spec:
             path: /var/log/pods
         containers:
         - name: agent
-          securityContext:
-            runAsUser: 0
           resources:
             requests:
               cpu: 1
-              memory: 1Gi
+              memory: 2Gi
             limits:
               cpu: 1
-              memory: 1Gi
+              memory: 2Gi
           env:
           - name: NODE_NAME
             valueFrom:
@@ -148,7 +145,9 @@ spec:
         node: ${NODE_NAME}
         scope: node
     inputs:
-
+    #
+    # kubernetes container logs
+    #
     - id: container-log-${kubernetes.pod.name}-${kubernetes.container.id}
       type: filestream
       use_output: default
@@ -165,7 +164,9 @@ spec:
           type: logs
         prospector.scanner.symlinks: true
         paths: ["/var/log/containers/*${kubernetes.container.id}.log"]
-
+    #
+    # kubernetes kube state metrics
+    #
     - id: kubernetes/metrics
       type: kubernetes/metrics
       use_output: default
@@ -341,7 +342,9 @@ spec:
         period: 10s
         hosts: ["local-kube-state-metrics.base-prometheus:8080"]
         ssl.verification_mode: none
-
+      #
+      # kubernetes api metrics
+      #
       - id: kubernetes/metrics-kubernetes.apiserver
         data_stream:
           dataset: kubernetes.apiserver
@@ -353,40 +356,9 @@ spec:
         period: 30s
         hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
         ssl.certificate_authorities: ["/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"]
-
-#      - id: kubernetes/metrics-kubernetes.proxy
-#        data_stream:
-#          dataset: kubernetes.proxy
-#          type: metrics
-#        metricsets:
-#        - proxy
-#        add_metadata: true
-#        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-#        period: 10s
-#        hosts: ["http://localhost:10249"]
-
-#      - id: kubernetes/metrics-kubernetes.scheduler
-#        data_stream:
-#          dataset: kubernetes.scheduler
-#          type: metrics
-#        metricsets:
-#        - scheduler
-#        add_metadata: true
-#        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-#        period: 10s
-#        hosts: ["http://localhost:10259"]
-
-#      - id: kubernetes/metrics-kubernetes.controllermanager
-#        data_stream:
-#          dataset: kubernetes.controllermanager
-#          type: metrics
-#        metricsets:
-#        - controllermanager
-#        add_metadata: true
-#        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-#        period: 10s
-#        hosts: ["http://localhost:10257"]
-
+      #
+      # kubernetes kubelet metrics
+      #
       - id: kubernetes/metrics-kubernetes.container
         data_stream:
           dataset: kubernetes.container
@@ -453,7 +425,9 @@ spec:
         period: 10s
         hosts: ["https://192.168.2.14:10250"]
         ssl.verification_mode: none
-
+    #
+    # system metrics
+    #
     - id: system/metrics
       type: system/metrics
       use_output: default
