@@ -9,8 +9,6 @@ spec:
   count: 1
   elasticsearchRef:
     name: elastic-01
-  config:
-    monitoring.ui.ccs.enabled: false
   podTemplate:
     spec:
       containers:
@@ -18,7 +16,7 @@ spec:
         resources:
           requests:
             cpu: 1
-            memory: 1Gi
+            memory: 2Gi
           limits:
             cpu: 1
-            memory: 1Gi
+            memory: 2Gi
